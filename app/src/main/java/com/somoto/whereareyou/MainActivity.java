@@ -1,5 +1,6 @@
 package com.somoto.whereareyou;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -22,10 +23,20 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                fabClicked();
             }
         });
+    }
+
+    private void fabClicked(){
+        String link = "https://blat.com";
+        String message = getString(R.string.message);
+        String fullMessage = message+" "+link;
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, fullMessage);
+        sendIntent.setType("text/plain");
+        startActivity(sendIntent);
     }
 
     @Override
