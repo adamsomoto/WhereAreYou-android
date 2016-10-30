@@ -1,4 +1,4 @@
-package com.somoto.whereareyou;
+package com.somoto.whereareyou.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.somoto.whereareyou.R;
+import com.somoto.whereareyou.internet.Internet;
+
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,7 +34,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fabClicked(){
-        String link = "https://blat.com";
+        Random rand = new Random();
+        long randLong = rand.nextLong();
+        String link = Internet.HOST+"/"+randLong;
         String message = getString(R.string.message);
         String fullMessage = message+" "+link;
         Intent sendIntent = new Intent();
