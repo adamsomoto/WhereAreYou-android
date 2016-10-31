@@ -32,7 +32,7 @@ public class Internet {
         sendIntent.putExtra(Intent.EXTRA_TEXT, fullMessage);
         sendIntent.setType("text/plain");
         context.startActivity(sendIntent);
-        SharedPrefs.addUmid(context, ""+umid);
+        //SharedPrefs.addUmid(context, ""+umid);
     }
 
     public static String httpGET(String page) {
