@@ -52,32 +52,43 @@ public class SendActivity extends AppCompatActivity {
                 fabClicked();
             }
         });
-        refreshThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(true){
-                    try {
-                        refresh();
-                        Thread.sleep(10 * 1000);
-                    }
-                    catch (Exception e){
-                        MyLog.e(e);
-                    }
-                }
-            }
-        });
+        refresh();
+//        refreshThread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while(true){
+//                    try {
+//                        refresh();
+//                        Thread.sleep(10 * 1000);
+//                    }
+//                    catch (Exception e){
+//                        MyLog.e(e);
+//                    }
+//                }
+//            }
+//        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        refreshThread.start();
+        try {
+            refreshThread.start();
+        }
+        catch (Exception e){
+            MyLog.e(e);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        refreshThread.start();
+        try {
+            refreshThread.start();
+        }
+        catch (Exception e){
+            MyLog.e(e);
+        }
     }
 
     private void refresh(){
@@ -106,10 +117,8 @@ public class SendActivity extends AppCompatActivity {
     private void fabClicked(){
         Random rand = new Random();
         final int umid = rand.nextInt(9999);
-        Gson gson = new Gson();
         Map<String,String> map = new HashMap<>();
         map.put("umid", ""+umid);
-        String json = gson.toJson(map);
         new PostDataTask(new InternetDataListener<HttpResponse>() {
             @Override
             public void handleData(HttpResponse data) {
@@ -120,7 +129,7 @@ public class SendActivity extends AppCompatActivity {
                     sendInvitation(SendActivity.this, umid);
                 }
             }
-        }, "Users", json).execute();
+        }, "Users", map).execute();
     }
 
     private void sendInvitation(Context context, int umid){
