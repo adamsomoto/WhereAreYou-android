@@ -1,6 +1,9 @@
 package com.somoto.whereareyou.ui;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -9,20 +12,28 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+
+import com.google.gson.Gson;
 import com.somoto.whereareyou.R;
 import com.somoto.whereareyou.internet.GetDataTask;
+import com.somoto.whereareyou.internet.HttpResponse;
 import com.somoto.whereareyou.internet.Internet;
 import com.somoto.whereareyou.internet.InternetDataListener;
+import com.somoto.whereareyou.internet.PostDataTask;
 import com.somoto.whereareyou.util.MyJsonParser;
 import com.somoto.whereareyou.util.MyLog;
 import com.somoto.whereareyou.util.User;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class SendActivity extends AppCompatActivity {
 
     private ListView listView;
     private UserAdapter adapter;
+    private Thread refreshThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +52,35 @@ public class SendActivity extends AppCompatActivity {
                 fabClicked();
             }
         });
+        refreshThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true){
+                    try {
+                        refresh();
+                        Thread.sleep(10 * 1000);
+                    }
+                    catch (Exception e){
+                        MyLog.e(e);
+                    }
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshThread.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        refreshThread.start();
+    }
+
+    private void refresh(){
         new GetDataTask(new InternetDataListener<String>() {
             @Override
             public void handleData(String data) {
@@ -64,7 +104,36 @@ public class SendActivity extends AppCompatActivity {
     }
 
     private void fabClicked(){
-        Internet.invite(this);
+        Random rand = new Random();
+        final int umid = rand.nextInt(9999);
+        Gson gson = new Gson();
+        Map<String,String> map = new HashMap<>();
+        map.put("umid", ""+umid);
+        String json = gson.toJson(map);
+        new PostDataTask(new InternetDataListener<HttpResponse>() {
+            @Override
+            public void handleData(HttpResponse data) {
+                if(data.statusCode!=200){
+                    Snackbar.make(listView, data.error, Snackbar.LENGTH_LONG).show();
+                }
+                else {
+                    sendInvitation(SendActivity.this, umid);
+                }
+            }
+        }, "Users", json).execute();
+    }
+
+    private void sendInvitation(Context context, int umid){
+        String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        String link = Internet.HOST+"/share_loc.html?umid="+umid+"&androidid="+android_id;
+        String message = context.getString(R.string.message);
+        String fullMessage = message+" "+link;
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, fullMessage);
+        sendIntent.setType("text/plain");
+        context.startActivity(sendIntent);
+        //SharedPrefs.addUmid(context, ""+umid);
     }
 
     @Override
