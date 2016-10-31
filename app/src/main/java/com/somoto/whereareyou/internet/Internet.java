@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.provider.Settings;
 
 import com.somoto.whereareyou.R;
+import com.somoto.whereareyou.util.SharedPrefs;
 
 import org.apache.commons.io.IOUtils;
 
@@ -31,7 +32,7 @@ public class Internet {
         sendIntent.putExtra(Intent.EXTRA_TEXT, fullMessage);
         sendIntent.setType("text/plain");
         context.startActivity(sendIntent);
-        //TODO write the umid in SharedPrefs
+        //SharedPrefs.addUmid(context, ""+umid);
     }
 
     public static String httpGET(String page) {
