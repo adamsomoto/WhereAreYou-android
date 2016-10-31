@@ -13,6 +13,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import android.location.Location;
@@ -98,8 +100,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             map.clear();
             List<User> list = MyJsonParser.parseJsonArray(data, User.class);
             for(User iter : list) {
+                if(iter.latitude==null || iter.longitude==null){
+                    continue;
+                }
                 LatLng latLng = new LatLng(Double.parseDouble(iter.latitude), Double.parseDouble(iter.longitude));
-                map.addMarker(new MarkerOptions().position(latLng).title(iter.umid));
+                MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(iter.umid);
+                map.addMarker(markerOptions);
             }
             addMyMarker();
         }
@@ -112,7 +118,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Location location = MapUtil.getLastBestLocation(this);
         if (location != null) {
             LatLng current_location = new LatLng(location.getLatitude(),  location.getLongitude());
-            map.addMarker(new MarkerOptions().position(current_location).title("Current location"));
+            BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(android.R.drawable.btn_star_big_on);
+            map.addMarker(new MarkerOptions().position(current_location).title("Current location").icon(icon));
             map.moveCamera(CameraUpdateFactory.newLatLng(current_location));
         }
     }
