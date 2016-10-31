@@ -1,6 +1,5 @@
 package com.somoto.whereareyou.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -9,8 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
-
+import android.widget.ListView;
 import com.somoto.whereareyou.R;
 import com.somoto.whereareyou.internet.GetDataTask;
 import com.somoto.whereareyou.internet.Internet;
@@ -20,17 +18,19 @@ import com.somoto.whereareyou.util.MyLog;
 import com.somoto.whereareyou.util.User;
 
 import java.util.List;
-import java.util.Random;
 
 public class SendActivity extends AppCompatActivity {
 
-    private TextView textView;
+    private ListView listView;
+    private UserAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send);
-        textView = (TextView) findViewById(R.id.textView);
+        listView = (ListView) findViewById(R.id.list_view);
+        adapter = new UserAdapter(this);
+        listView.setAdapter(adapter);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -51,13 +51,12 @@ public class SendActivity extends AppCompatActivity {
 
     private void handleResponse(String data){
         if(data==null){
-            Snackbar.make(textView, "Internet problem", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(listView, "Internet problem", Snackbar.LENGTH_LONG).show();
         }
         try {
             List<User> list = MyJsonParser.parseJsonArray(data, User.class);
-            //adapter.clear();
-            //adapter.addAll(list);
-            Snackbar.make(textView, list.size(), Snackbar.LENGTH_LONG).show();
+            adapter.clear();
+            adapter.addAll(list);
         }
         catch (Exception e){
             MyLog.e(e);
