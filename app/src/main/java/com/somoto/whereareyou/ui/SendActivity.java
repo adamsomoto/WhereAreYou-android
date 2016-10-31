@@ -15,7 +15,11 @@ import com.somoto.whereareyou.R;
 import com.somoto.whereareyou.internet.GetDataTask;
 import com.somoto.whereareyou.internet.Internet;
 import com.somoto.whereareyou.internet.InternetDataListener;
+import com.somoto.whereareyou.util.MyJsonParser;
+import com.somoto.whereareyou.util.MyLog;
+import com.somoto.whereareyou.util.User;
 
+import java.util.List;
 import java.util.Random;
 
 public class SendActivity extends AppCompatActivity {
@@ -46,7 +50,18 @@ public class SendActivity extends AppCompatActivity {
     }
 
     private void handleResponse(String data){
-        Snackbar.make(textView, data, Snackbar.LENGTH_LONG).show();
+        if(data==null){
+            Snackbar.make(textView, "Internet problem", Snackbar.LENGTH_LONG).show();
+        }
+        try {
+            List<User> list = MyJsonParser.parseJsonArray(data, User.class);
+            //adapter.clear();
+            //adapter.addAll(list);
+            Snackbar.make(textView, list.size(), Snackbar.LENGTH_LONG).show();
+        }
+        catch (Exception e){
+            MyLog.e(e);
+        }
     }
 
     private void fabClicked(){
