@@ -6,11 +6,19 @@ import android.provider.Settings;
 
 import com.somoto.whereareyou.R;
 
+import org.apache.commons.io.IOUtils;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Random;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class Internet {
 
     public static final String HOST = "https://whereareyou-148008.appspot.com";
+    private static final String UTF8 = "UTF-8";
 
     public static void invite(Context context){
         String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -26,5 +34,22 @@ public class Internet {
         context.startActivity(sendIntent);
         //TODO write the umid in SharedPrefs
     }
+
+    public static String httpGET(String page) {
+        try {
+            URL url = new URL(HOST + "/" + URLEncoder.encode(page, UTF8));
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            if (conn.getResponseCode() != 200) {
+                return null;
+            }
+            String response = IOUtils.toString(conn.getInputStream(), UTF8);
+            return response;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
 }
