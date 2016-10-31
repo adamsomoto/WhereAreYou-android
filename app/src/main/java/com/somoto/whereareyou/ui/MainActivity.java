@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -17,6 +18,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -88,18 +90,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     public Location getLastBestLocation() {
 
+        if ( ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
 
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            Toast.makeText(this, "First enable LOCATION ACCESS in settings.", Toast.LENGTH_LONG).show();
-            return null;
+            /*ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
+                    'MY_PERMISSION_ACCESS_COURSE_LOCATION' );*/
         }
+
 
         LocationManager  mLocationManager = (LocationManager)
                 getSystemService(Context.LOCATION_SERVICE);
@@ -118,10 +114,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
 
             if (isNetworkEnabled) {
-                mLocationManager.requestLocationUpdates(
+               /* mLocationManager.requestLocationUpdates(
                         LocationManager.NETWORK_PROVIDER,
                         MIN_TIME_BW_UPDATES,
-                        MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        MIN_DISTANCE_CHANGE_FOR_UPDATES, this);*/
                 Log.d("Network", "Network");
 
                 if (mLocationManager != null) {
@@ -131,15 +127,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             if (isGPSEnabled) {
                 if (locationNet == null) {
-                    mLocationManager.requestLocationUpdates(
+                    /* mLocationManager.requestLocationUpdates(
                             LocationManager.GPS_PROVIDER,
                             MIN_TIME_BW_UPDATES,
-                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);*/
                     Log.d("GPS Enabled", "GPS Enabled");
 
                     if (mLocationManager != null) {
                         locationGPS = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                     }
+
                 }
             }
         }
