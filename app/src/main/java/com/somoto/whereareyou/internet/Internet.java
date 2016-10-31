@@ -16,6 +16,7 @@ import java.util.Random;
 public class Internet {
 
     public static final String HOST = "https://whereareyou-148008.appspot.com";
+    public static final String USERS = "Users";
     private static final String UTF8 = "UTF-8";
 
     public static void invite(Context context){

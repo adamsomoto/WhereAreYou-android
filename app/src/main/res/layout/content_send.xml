@@ -13,4 +13,16 @@
     tools:context="com.somoto.whereareyou.ui.SendActivity"
     tools:showIn="@layout/activity_send">
 
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="69dp"
+        android:layout_marginStart="69dp"
+        android:layout_marginTop="61dp"
+        android:id="@+id/textView" />
 </RelativeLayout>
