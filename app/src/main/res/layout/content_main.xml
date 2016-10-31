@@ -13,8 +13,10 @@
     tools:context="com.somoto.whereareyou.ui.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <com.google.android.gms.maps.MapView
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/mapView" />
+        class="com.google.android.gms.maps.SupportMapFragment" />
+
 </RelativeLayout>
