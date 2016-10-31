@@ -9,18 +9,24 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.somoto.whereareyou.R;
+import com.somoto.whereareyou.internet.GetDataTask;
 import com.somoto.whereareyou.internet.Internet;
+import com.somoto.whereareyou.internet.InternetDataListener;
 
 import java.util.Random;
 
 public class SendActivity extends AppCompatActivity {
 
+    private TextView textView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_send);
+        textView = (TextView) findViewById(R.id.textView);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -31,6 +37,16 @@ public class SendActivity extends AppCompatActivity {
                 fabClicked();
             }
         });
+        new GetDataTask(new InternetDataListener<String>() {
+            @Override
+            public void handleData(String data) {
+                handleResponse(data);
+            }
+        }).execute(Internet.USERS);
+    }
+
+    private void handleResponse(String data){
+        Snackbar.make(textView, data, Snackbar.LENGTH_LONG).show();
     }
 
     private void fabClicked(){

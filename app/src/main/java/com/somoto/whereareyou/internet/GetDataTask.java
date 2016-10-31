@@ -6,7 +6,7 @@ public class GetDataTask extends AsyncTask<String, Integer, String> {
 
     private InternetDataListener<String> internetDataListener;
 
-    public GetDataTask(InternetDataListener<String> internetDataListener){
+    public GetDataTask(InternetDataListener internetDataListener){
         this.internetDataListener = internetDataListener;
     }
 
