@@ -30,10 +30,7 @@ import com.somoto.whereareyou.internet.Internet;
 
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity  {
-    static final LatLng HAMBURG = new LatLng(53.558, 9.927);
-    static final LatLng KIEL = new LatLng(53.551, 9.993);
-    private GoogleMap mMap;
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,16 +40,18 @@ public class MainActivity extends AppCompatActivity  {
         setSupportActionBar(toolbar);
 
 
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
 
-
-     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                fabClicked();
-            }
-        });
+         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    fabClicked();
+                }
+            });
     }
 
     private void fabClicked(){
@@ -89,5 +88,13 @@ public class MainActivity extends AppCompatActivity  {
 
         return super.onOptionsItemSelected(item);
     }
-
+    /**
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we
+     * just add a marker near Africa.
+     */
+    @Override
+    public void onMapReady(GoogleMap map) {
+        map.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+    }
 }
