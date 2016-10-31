@@ -13,8 +13,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Random;
 
-import javax.net.ssl.HttpsURLConnection;
-
 public class Internet {
 
     public static final String HOST = "https://whereareyou-148008.appspot.com";
