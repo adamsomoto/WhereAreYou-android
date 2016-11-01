@@ -39,7 +39,7 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback{
 
     private Toolbar toolbar;
-    private GoogleMap map;
+    private GoogleMap googleMap;
     private boolean isResumed;
     private boolean isCentered;
 
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onResume() {
         super.onResume();
         isResumed = true;
-        refresh();
+        getData();
     }
 
     @Override
@@ -73,23 +73,50 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         isResumed = false;
     }
 
-    private void refresh(){
-        MyLog.i("refresh");
+    private void getData(){
+        MyLog.i("getData");
+        if(!isResumed) {
+            return;
+        }
         new GetDataTask(new InternetDataListener<String>() {
             @Override
             public void handleData(String data) {
                 handleResponse(data);
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(isResumed) {
-                            refresh();
-                        }
-                    }
-                }, 10000);
+                postData();
             }
         }).execute(Internet.USERS);
+    }
+
+    private void postData(){
+        MyLog.i("postData");
+        Location location = MapUtil.getLastBestLocation(this);
+        if (location == null) {
+            delayAndStartNewRefreshCycle();
+        }
+        else {
+            String androidid = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+            Map<String,String> map = new HashMap<>();
+            map.put("umid", androidid);
+            map.put("latitude", ""+location.getLatitude());
+            map.put("longitude", ""+location.getLongitude());
+            new PostDataTask(new InternetDataListener<HttpResponse>() {
+                @Override
+                public void handleData(HttpResponse data) {
+                    delayAndStartNewRefreshCycle();
+                }
+            }, "Users", map).execute();
+        }
+    }
+
+    private void delayAndStartNewRefreshCycle(){
+        MyLog.i("delay");
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getData();
+            }
+        }, 10000);
     }
 
     private void handleResponse(String data){
@@ -97,10 +124,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             Snackbar.make(toolbar, "Internet problem", Snackbar.LENGTH_LONG).show();
         }
         try {
-            if(map==null){
+            if(googleMap==null){
                 return;
             }
-            map.clear();
+            googleMap.clear();
             List<User> list = MyJsonParser.parseJsonArray(data, User.class);
             for(User iter : list) {
                 if(iter.latitude==null || iter.longitude==null){
@@ -108,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 LatLng latLng = new LatLng(Double.parseDouble(iter.latitude), Double.parseDouble(iter.longitude));
                 MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(iter.umid);
-                map.addMarker(markerOptions);
+                googleMap.addMarker(markerOptions);
             }
             addMyMarker();
         }
@@ -122,9 +149,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (location != null) {
             LatLng current_location = new LatLng(location.getLatitude(),  location.getLongitude());
             BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(android.R.drawable.btn_star_big_on);
-            map.addMarker(new MarkerOptions().position(current_location).title("Current location").icon(icon));
+            googleMap.addMarker(new MarkerOptions().position(current_location).title("Current location").icon(icon));
             if(!isCentered) {
-                map.moveCamera(CameraUpdateFactory.newLatLng(current_location));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(current_location));
                 isCentered = true;
             }
         }
@@ -163,9 +190,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public void onMapReady(GoogleMap map) {
-        this.map = map;
-        map.moveCamera(CameraUpdateFactory.zoomTo(15));
+    public void onMapReady(GoogleMap googleMap) {
+        this.googleMap = googleMap;
+        googleMap.moveCamera(CameraUpdateFactory.zoomTo(15));
         addMyMarker();
     }
 
