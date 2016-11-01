@@ -9,6 +9,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Toolbar toolbar;
     private GoogleMap map;
     private boolean isResumed;
+    private boolean isCentered;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +123,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             LatLng current_location = new LatLng(location.getLatitude(),  location.getLongitude());
             BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(android.R.drawable.btn_star_big_on);
             map.addMarker(new MarkerOptions().position(current_location).title("Current location").icon(icon));
-            map.moveCamera(CameraUpdateFactory.newLatLng(current_location));
+            if(!isCentered) {
+                map.moveCamera(CameraUpdateFactory.newLatLng(current_location));
+                isCentered = true;
+            }
         }
     }
 
@@ -159,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap map) {
         this.map = map;
+        map.moveCamera(CameraUpdateFactory.zoomTo(15));
         addMyMarker();
     }
 
