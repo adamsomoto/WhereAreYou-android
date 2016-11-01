@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -42,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap googleMap;
     private boolean isResumed;
     private boolean isCentered;
+    private static String ANDROID_ID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 fabClicked();
             }
         });
+        ANDROID_ID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
     @Override
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         new GetDataTask(new InternetDataListener<String>() {
             @Override
             public void handleData(String data) {
-                handleResponse(data);
+                handleGetUsersResponse(data);
                 postData();
             }
         }).execute(Internet.USERS);
@@ -94,9 +95,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             delayAndStartNewRefreshCycle();
         }
         else {
-            String androidid = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
             Map<String,String> map = new HashMap<>();
-            map.put("umid", androidid);
+            map.put("umid", ANDROID_ID);
             map.put("latitude", ""+location.getLatitude());
             map.put("longitude", ""+location.getLongitude());
             new PostDataTask(new InternetDataListener<HttpResponse>() {
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, 10000);
     }
 
-    private void handleResponse(String data){
+    private void handleGetUsersResponse(String data){
         if(data==null){
             Snackbar.make(toolbar, "Internet problem", Snackbar.LENGTH_LONG).show();
         }
@@ -131,6 +131,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             List<User> list = MyJsonParser.parseJsonArray(data, User.class);
             for(User iter : list) {
                 if(iter.latitude==null || iter.longitude==null){
+                    continue;
+                }
+                if(iter.umid.equals(ANDROID_ID)){
                     continue;
                 }
                 LatLng latLng = new LatLng(Double.parseDouble(iter.latitude), Double.parseDouble(iter.longitude));
@@ -177,8 +180,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void sendInvitation(int umid){
-        String android_id = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        String link = Internet.HOST+"/share_loc.html?umid="+umid+"&androidid="+android_id;
+        String link = Internet.HOST+"/share_loc.html?umid="+umid+"&androidid="+ANDROID_ID;
         String message = getString(R.string.message);
         String fullMessage = message+" "+link;
         Intent sendIntent = new Intent();
