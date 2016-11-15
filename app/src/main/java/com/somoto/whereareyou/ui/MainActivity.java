@@ -130,13 +130,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             googleMap.clear();
             List<User> list = MyJsonParser.parseJsonArray(data, User.class);
             for(User iter : list) {
-                if(iter.latitude==null || iter.longitude==null){
+                if(iter.lat==null || iter.lng==null){
                     continue;
                 }
                 if(iter.umid.equals(ANDROID_ID)){
                     continue;
                 }
-                LatLng latLng = new LatLng(Double.parseDouble(iter.latitude), Double.parseDouble(iter.longitude));
+                LatLng latLng = new LatLng(iter.lat, iter.lng);
                 MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(iter.umid);
                 googleMap.addMarker(markerOptions);
             }

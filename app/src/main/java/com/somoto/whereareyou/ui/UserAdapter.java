@@ -25,8 +25,8 @@ public class UserAdapter extends ArrayAdapter<User> {
         TextView latTV = (TextView) convertView.findViewById(R.id.lat);
         TextView lngTV = (TextView) convertView.findViewById(R.id.lng);
         umidTV.setText(element.umid);
-        latTV.setText(element.latitude);
-        lngTV.setText(element.longitude);
+        latTV.setText(element.lat);
+        lngTV.setText(element.lng);
         return convertView;
     }
 
